@@ -11,16 +11,12 @@
 
     function notify(message) {
         console.log('[TDX Presets]', message);
+    }
+
     function change(el) {
-        if (!el) return;
-    
-        el.dispatchEvent(new Event('input', {
-            bubbles: true
-        }));
-    
-        el.dispatchEvent(new Event('change', {
-            bubbles: true
-        }));
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        el.dispatchEvent(new Event('change', { bubbles: true }));
+
     }
 
     function setValue(id, value) {
@@ -510,25 +506,32 @@
     // INITIALIZE
     // ==========================================
 
+    const ENABLED_KEY = 'tdx-presets-enabled';
+    let extensionEnabled = true;
+
+    function updateToolbarVisibility() {
+        if (toolbar.isConnected) {
+            toolbar.style.display = extensionEnabled ? 'flex' : 'none';
+        }
+    }
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'local' || !changes[ENABLED_KEY]) return;
+        extensionEnabled = changes[ENABLED_KEY].newValue !== false;
+        updateToolbarVisibility();
+    });
+
     async function start() {
-        // Only show on the actual TDX ticket edit page
-        const isEditPage =
-            window.location.pathname.includes(
-                '/TDNext/Apps/34/Tickets/Edit'
-            );
-    
-        if (!isEditPage) return;
-    
-        // Make sure the ticket form exists
-        const form = document.getElementById('FormID');
-    
-        if (!form) return;
-    
-        // Prevent duplicate toolbars
+        if (window.location.pathname !== '/TDNext/Apps/34/Tickets/Edit') return;
+
         if (byId(toolbar.id)) return;
+        // Only attach the toolbar to the document containing the ticket fields.
+        // TDX can place its editor inside an iframe.
+        if (!byId('FormID') && !byId('attribute37')) return;
 
         try {
-            const stored = await chrome.storage.local.get([STORAGE_KEY, POSITION_KEY]);
+            const stored = await chrome.storage.local.get([STORAGE_KEY, POSITION_KEY, ENABLED_KEY]);
+            extensionEnabled = stored[ENABLED_KEY] !== false;
             let presets = stored[STORAGE_KEY];
             let pos = stored[POSITION_KEY];
 
@@ -560,13 +563,20 @@
         } catch (err) { notify('Remote config unavailable: ' + err.message); }
         renderBuiltIns();
         renderCustomButtons();
-        document.body.appendChild(toolbar);
+        if (!byId(toolbar.id)) document.body.appendChild(toolbar);
+        updateToolbarVisibility();
     }
 
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', start, { once: true });
-    } else {
+    // TDX can render its form after DOMContentLoaded. Observe until it appears.
+    let started = false;
+    const tryStart = () => {
+        if (started || (!byId('FormID') && !byId('attribute37'))) return;
+        started = true;
+        observer.disconnect();
         start();
-    }
+    };
+    const observer = new MutationObserver(tryStart);
+    observer.observe(document, { childList: true, subtree: true });
+    tryStart();
 
 })();
