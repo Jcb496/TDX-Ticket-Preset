@@ -511,6 +511,20 @@
     // ==========================================
 
     async function start() {
+        // Only show on the actual TDX ticket edit page
+        const isEditPage =
+            window.location.pathname.includes(
+                '/TDNext/Apps/34/Tickets/Edit'
+            );
+    
+        if (!isEditPage) return;
+    
+        // Make sure the ticket form exists
+        const form = document.getElementById('FormID');
+    
+        if (!form) return;
+    
+        // Prevent duplicate toolbars
         if (byId(toolbar.id)) return;
 
         try {
