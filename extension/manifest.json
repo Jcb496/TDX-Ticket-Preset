@@ -1,8 +1,9 @@
 {
-  "manifest_version": 3,
-  "name": "TDX Presets",
-  "version": "3.0.4",
-  "description": "TDX ticket presets with centrally managed configuration and local custom presets.",
+"name": "TDX Presets",
+"short_name": "TDX Presets",
+"version": "1.0.0",
+"version_name": "1.0",
+"description": "Fill out TDX tickets faster with built-in and custom presets. Save, edit, and reuse ticket information with one click.",
   "permissions": [
     "storage"
   ],
