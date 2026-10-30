@@ -1,18 +1,48 @@
-name: Package cross-browser extension
+
+name: Package TDX Presets Extensions
+
 on:
   push:
-    tags: ['v*']
+    branches:
+      - main
+    tags:
+      - 'v*'
+    paths:
+      - 'Chrome/**'
+      - 'Edge/**'
+      - 'Firefox/**'
+      - 'build.py'
+      - '.github/workflows/package.yml'
+
   workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   package:
+    name: Build Chrome, Edge, and Firefox
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python build.py
-      - uses: actions/upload-artifact@v4
+
+      - name: Build extensions
+        run: python build.py
+
+      - name: Upload extension packages
+        uses: actions/upload-artifact@v4
         with:
           name: tdx-presets-extension-packages
-          path: dist/*.zip
+          path: |
+            dist/tdx-presets-chrome-*.zip
+            dist/tdx-presets-edge-*.zip
+            dist/tdx-presets-firefox-*.zip
+          if-no-files-found: error
+          retention-days: 30
