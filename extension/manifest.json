@@ -1,4 +1,5 @@
 {
+  "manifest_version": 3,
 "name": "TDX Presets",
 "short_name": "TDX Presets",
 "version": "1.0.0",
