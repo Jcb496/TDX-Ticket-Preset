@@ -6,8 +6,8 @@
   "permissions": [
     "storage"
   ],
-  "optional_host_permissions": [
-    "https://*/*"
+  "host_permissions": [
+    "https://jcb496.github.io/*"
   ],
   "icons": {
     "16": "icons/icon16.png",

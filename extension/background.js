@@ -2,6 +2,8 @@
 const CONFIG_KEY='tdx-remote-config-v1';
 const URL_KEY='tdx-remote-url-v1';
 const CHECK_KEY='tdx-remote-last-check-v1';
+const DEFAULT_CONFIG_URL =
+  'https://jcb496.github.io/TDX-Ticket-Preset/config/presets.json';
 const INTERVAL=60*60*1000;
 function validate(data) {
   if (!data || data.schemaVersion !== 1 || !Array.isArray(data.presets) || data.presets.length>40 || typeof data.formId!=='string' || !data.commonFields || typeof data.commonFields!=='object') throw Error('Invalid config schema');
@@ -16,7 +18,7 @@ function validate(data) {
 }
 async function getConfig(force=false) {
   const state=await chrome.storage.local.get([CONFIG_KEY,URL_KEY,CHECK_KEY]);
-  const url=state[URL_KEY];
+  const url=state[URL_KEY] || DEFAULT_CONFIG_URL;
   if(!url) return {config:state[CONFIG_KEY]||null,status:'bundled'};
   if(!force && Date.now()-(state[CHECK_KEY]||0)<INTERVAL) return {config:state[CONFIG_KEY]||null,status:'cached'};
   try {
