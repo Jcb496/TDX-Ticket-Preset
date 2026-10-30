@@ -4,7 +4,7 @@ const URL_KEY='tdx-remote-url-v1';
 const CHECK_KEY='tdx-remote-last-check-v1';
 const DEFAULT_CONFIG_URL =
   'https://jcb496.github.io/TDX-Ticket-Preset/config/presets.json';
-const INTERVAL=60*60*1000;
+const INTERVAL=3*60*60*1000;
 function validate(data) {
   if (!data || data.schemaVersion !== 1 || !Array.isArray(data.presets) || data.presets.length>40 || typeof data.formId!=='string' || !data.commonFields || typeof data.commonFields!=='object') throw Error('Invalid config schema');
   const allowed=['attribute3236','attribute2682','attribute1279','attribute1279_input'];
@@ -45,3 +45,32 @@ chrome.runtime.onMessage.addListener((message,sender,sendResponse)=>{
   getConfig(Boolean(message.force)).then(sendResponse).catch(e=>sendResponse({config:null,status:'error',error:String(e)}));
   return true;
 });
+
+// Browser-managed hourly refresh. No page or popup needs to stay open.
+const UPDATE_ALARM = 'tdx-presets-hourly-refresh';
+async function ensureUpdateAlarm() {
+  const existing = await chrome.alarms.get(UPDATE_ALARM);
+  if (!existing) {
+    await chrome.alarms.create(UPDATE_ALARM, {
+      delayInMinutes: 1,
+      periodInMinutes: 180
+    });
+  }
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  ensureUpdateAlarm().catch(err => console.error('[TDX Presets] Alarm setup:', err));
+});
+chrome.runtime.onStartup.addListener(() => {
+  ensureUpdateAlarm().catch(err => console.error('[TDX Presets] Alarm setup:', err));
+});
+chrome.alarms.onAlarm.addListener(alarm => {
+  if (alarm.name !== UPDATE_ALARM) return;
+  getConfig(true).then(result => {
+    if (result.status === 'fallback' || result.status === 'error') {
+      console.warn('[TDX Presets] Scheduled update:', result.error);
+    }
+  }).catch(err => console.error('[TDX Presets] Scheduled update:', err));
+});
+// Restore the alarm if the browser cleared it.
+ensureUpdateAlarm().catch(err => console.error('[TDX Presets] Alarm setup:', err));

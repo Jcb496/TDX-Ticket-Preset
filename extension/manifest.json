@@ -6,7 +6,8 @@
 "version_name": "1.0",
 "description": "Fill out TDX tickets faster with built-in and custom presets. Save, edit, and reuse ticket information with one click.",
   "permissions": [
-    "storage"
+    "storage",
+    "alarms"
   ],
   "host_permissions": [
     "https://jcb496.github.io/*"
