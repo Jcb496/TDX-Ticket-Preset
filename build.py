@@ -79,6 +79,10 @@ def build_extension(browser, folder):
 def main():
     DIST.mkdir(parents=True, exist_ok=True)
 
+    # Remove previously generated extension packages
+    for old_zip in DIST.glob("tdx-presets-*.zip"):
+        old_zip.unlink()
+
     for browser, folder in BROWSERS.items():
         build_extension(browser, folder)
 
