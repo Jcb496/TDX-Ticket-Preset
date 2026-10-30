@@ -11,12 +11,16 @@
 
     function notify(message) {
         console.log('[TDX Presets]', message);
-    }
-
     function change(el) {
-        el.dispatchEvent(new Event('input', { bubbles: true }));
-        el.dispatchEvent(new Event('change', { bubbles: true }));
-
+        if (!el) return;
+    
+        el.dispatchEvent(new Event('input', {
+            bubbles: true
+        }));
+    
+        el.dispatchEvent(new Event('change', {
+            bubbles: true
+        }));
     }
 
     function setValue(id, value) {
