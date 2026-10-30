@@ -1,0 +1,51 @@
+{
+  "manifest_version": 3,
+"name": "TDX Presets",
+"short_name": "TDX Presets",
+"version": "1.0.0",
+"description": "Fill out TDX tickets faster with built-in and custom presets. Save, edit, and reuse ticket information with one click.",
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "host_permissions": [
+    "https://jcb496.github.io/*"
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tdx-presets@jcb496.github.io",
+      "strict_min_version": "128.0"
+    }
+  },
+  "options_page": "options.html",
+  "content_scripts": [
+    {
+      "matches": [
+        "https://tdx.vanderbilt.edu/TDNext/Apps/34/Tickets/Edit*"
+      ],
+      "js": [
+        "default-config.js",
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_title": "TDX Presets",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_popup": "popup.html"
+  }
+}
