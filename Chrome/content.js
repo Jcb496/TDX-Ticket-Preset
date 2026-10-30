@@ -516,9 +516,18 @@
     }
 
     chrome.storage.onChanged.addListener((changes, area) => {
-        if (area !== 'local' || !changes[ENABLED_KEY]) return;
-        extensionEnabled = changes[ENABLED_KEY].newValue !== false;
-        updateToolbarVisibility();
+        if (area !== 'local') return;
+        if (changes[ENABLED_KEY]) {
+            extensionEnabled = changes[ENABLED_KEY].newValue !== false;
+            updateToolbarVisibility();
+        }
+        if (changes[STORAGE_KEY]) {
+            const next = changes[STORAGE_KEY].newValue;
+            cachedPresets = Array.isArray(next)
+                ? next.filter(p => p && typeof p.name === 'string' && p.fields && typeof p.fields === 'object')
+                : [];
+            if (toolbar.isConnected) renderCustomButtons();
+        }
     });
 
     async function start() {
