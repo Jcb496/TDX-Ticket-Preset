@@ -5,7 +5,6 @@
   "commonFields": {
     "attribute3236": "1442",
     "attribute2682": "719",
-    "attribute1279": "df54862a-c253-ef11-991b-c9204fe4007e",
   },
   "presets": [
     {"id":"okta","label":"Okta","search":"OneVU","service":"Accounts and Access Management / OneVU & Okta Verify (Multi Factor Authentication)","subject":"New Device for Okta Account"},
